@@ -19,7 +19,7 @@ class UserData extends EventEmitter {
     this._user = null;
     this._personalDb = null;
     this._as = null;
-    this._webContents = new Set();
+    this._listeners = new Set();
     this._isSyncing = false;
   }
 
@@ -98,43 +98,16 @@ class UserData extends EventEmitter {
     return null;
   }
 
-  registerWindow(webContents) {
-    this._webContents.add(webContents);
+  registerListener(listener) {
+    this._listeners.add(listener);
   }
 
-  unregisterWindow(webContents) {
-    this._webContents.delete(webContents);
+  unregisterListener(listener) {
+    this._listeners.delete(listener);
   }
 
-  get windows() {
-    return this._webContents;
-  }
-
-  async addImagesFromLocal(browserWindow, kbGuid, noteGuid) {
-    const dialogResult = await dialog.showOpenDialog(browserWindow, {
-      properties: ['openFile', 'multiSelections'],
-      filters: [{
-        name: 'Images (*.png, *.jpg, *.jpeg, *,bmp, *.gif)',
-        extensions: [
-          'png', 'jpg', 'jpeg', 'bmp', 'gif',
-        ],
-      }],
-    });
-    if (dialogResult.canceled) {
-      return [];
-    }
-    const result = [];
-    const resourcePath = paths.getNoteResources(this.userGuid, kbGuid, noteGuid);
-    await fs.ensureDir(resourcePath);
-    for (const file of dialogResult.filePaths) {
-      const guid = uuidv4();
-      const ext = path.extname(file);
-      const newName = guid + ext;
-      const imagePath = path.join(resourcePath, newName);
-      await fs.copyFile(file, imagePath);
-      result.push(`index_files/${newName}`);
-    }
-    return result;
+  get listeners() {
+    return this._listeners;
   }
 
   async addImageFromData(kbGuid, noteGuid, data) {
