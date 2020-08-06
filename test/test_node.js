@@ -1,5 +1,6 @@
 require('./node_wrapper');
-const sdk = require('../index');
+
+const sdk = require('./');
 
 (async () => {
   try {
