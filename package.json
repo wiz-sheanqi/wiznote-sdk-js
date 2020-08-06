@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "wiznote javascript sdk",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/WizTeam/wiznote-sdk-js.git"
@@ -34,7 +31,19 @@
     "xregexp": "^4.3.0"
   },
   "devDependencies": {
+    "clean-webpack-plugin": "^1.0.1",
+    "cross-env": "^5.2.0",
     "fs-extra": "^9.0.1",
-    "sqlite3": "^5.0.0"
+    "sqlite3": "^5.0.0",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.2.1",
+    "webpack-merge": "^4.2.1"
+  },
+  "scripts": {
+    "test": "node test/test_node",
+    "test-build": "node test/test_node production",
+    "dev": "cross-env NODE_ENV=development&&webpack --config webpack.dev.js",
+    "build": "cross-env NODE_ENV=production&&webpack --config webpack.production.js"
   }
 }

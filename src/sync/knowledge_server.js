@@ -1,5 +1,5 @@
 const path = require('path');
-const FormData = require('form-data');
+// const FormData = require('form-data');
 const ServerBase = require('./server_base');
 const paths = require('../common/paths');
 const { WizNotExistsError } = require('../share/error');
@@ -37,7 +37,10 @@ class KnowledgeServer extends ServerBase {
         throw new WizNotExistsError(`resource ${resName} does not exists`);
       }
       //
-      const formData = new FormData();
+      if (!this.FormData) {
+        this.FormData = require('form-data'); // browserify compatible. May throw if FormData is not supported natively.        
+      }
+      const formData = new this.FormData();
       formData.append('kbGuid', kbGuid);
       formData.append('docGuid', note.guid);
       formData.append('key', key);
