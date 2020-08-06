@@ -333,15 +333,15 @@ class Users {
     userData.setSettings(key, value);
   }
 
-  registerWindow(userGuid, webContents) {
+  registerListener(userGuid, listener) {
     const userData = this.getUserData(userGuid);
-    userData.registerWindow(webContents);
+    userData.registerListener(listener);
   }
 
-  unregisterWindow(webContents) {
+  unregisterListener(listener) {
     for (const userGuid of this._userMap.keys()) {
       const userData = this.getUserData(userGuid);
-      userData.unregisterWindow(webContents);
+      userData.unregisterListener(listener);
     }
   }
 
@@ -351,13 +351,13 @@ class Users {
       console.error(`failed to get user data: ${userGuid}, ${new Error().stack}`);
       return;
     }
-    const windows = userData.windows;
-    if (!windows) {
+    const listeners = userData.listeners;
+    if (!listeners) {
       return;
     }
     //
-    for (const webContents of windows) {
-      webContents.send(eventName, ...args);
+    for (const listener of listeners) {
+      listener.send(eventName, ...args);
     }
   }
 
