@@ -1,0 +1,40 @@
+{
+  "name": "wiznote-sdk-js",
+  "version": "1.0.0",
+  "description": "wiznote javascript sdk",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WizTeam/wiznote-sdk-js.git"
+  },
+  "keywords": [
+    "wiznote"
+  ],
+  "author": "WizTeam",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WizTeam/wiznote-sdk-js/issues"
+  },
+  "homepage": "https://github.com/WizTeam/wiznote-sdk-js#readme",
+  "dependencies": {
+    "assert": "^2.0.0",
+    "axios": "^0.19.2",
+    "events": "^3.2.0",
+    "i18next": "^19.6.3",
+    "image-type": "^4.1.0",
+    "lodash": "^4.17.19",
+    "md5": "^2.3.0",
+    "path": "^0.12.7",
+    "remove-markdown": "^0.3.0",
+    "url": "^0.11.0",
+    "uuid": "^8.3.0",
+    "xregexp": "^4.3.0"
+  },
+  "devDependencies": {
+    "fs-extra": "^9.0.1",
+    "sqlite3": "^5.0.0"
+  }
+}
