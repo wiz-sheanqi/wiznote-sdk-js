@@ -2,6 +2,7 @@
   "name": "wiznote-sdk-js",
   "version": "1.0.0",
   "description": "wiznote javascript sdk",
+  "homepage": "https://github.com/WizTeam/wiznote-sdk-js#readme",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -15,7 +16,6 @@
   "bugs": {
     "url": "https://github.com/WizTeam/wiznote-sdk-js/issues"
   },
-  "homepage": "https://github.com/WizTeam/wiznote-sdk-js#readme",
   "dependencies": {
     "assert": "^2.0.0",
     "axios": "^0.19.2",
