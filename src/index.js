@@ -176,6 +176,7 @@ const wizApi = {
   refreshUserInfo,
   core: {
     paths: require('./common/paths'),
+    utils: require('./utils'),
   }
 }
 
