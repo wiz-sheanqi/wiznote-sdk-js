@@ -174,6 +174,9 @@ const wizApi = {
   hasNotesInTrash,
   getUserSettings,
   refreshUserInfo,
+  core: {
+    paths: require('./common/paths'),
+  }
 }
 
 module.exports = wizApi;
