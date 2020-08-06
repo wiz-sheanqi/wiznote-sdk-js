@@ -2,7 +2,7 @@ const path = require('path');
 // const FormData = require('form-data');
 const ServerBase = require('./server_base');
 const paths = require('../common/paths');
-const { WizNotExistsError } = require('../share/error');
+const { WizNotExistsError } = require('wiznote-sdk-js-share').error;
 
 const { fs } = global.wizWrapper;
 

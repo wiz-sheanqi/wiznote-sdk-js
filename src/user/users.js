@@ -4,7 +4,7 @@ const UserData = require('./user_data');
 const dataStore = require('./data_store');
 const globalSettings = require('../settings/global_settings');
 const downloadNoteData = require('../sync/download_note_data');
-const { WizInternalError } = require('../share/error');
+const { WizInternalError } = require('wiznote-sdk-js-share').error;
 
 class Users {
   constructor() {

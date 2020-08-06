@@ -7,7 +7,7 @@ const i18next = require('i18next');
 const imageType = require('image-type');
 const debounce = require('lodash/debounce');
 const SyncKbTask = require('../sync/sync_kb_task');
-const { WizKnownError, WizInvalidParamError, WizInvalidPasswordError } = require('../share/error');
+const { WizKnownError, WizInvalidParamError, WizInvalidPasswordError } = require('wiznote-sdk-js-share').error;
 const paths = require('../common/paths');
 const UserSettings = require('../settings/user_settings');
 

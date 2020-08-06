@@ -1,15 +1,15 @@
 const path = require('path');
-// const xRegExp = require('xregexp');
-const getDefaultNoteHtml = require('./default_note_html');
-const paths = require('../common/paths');
 const {
   extractLinksFromMarkdown,
   extractTagsFromMarkdown,
   getMarkdownFromHtml,
   getResourcesFromHtml,
-} = require('../share/note_analysis');
+} = require('wiznote-sdk-js-share').noteAnalysis;
+const { WizInternalError } = require('wiznote-sdk-js-share').error;
+
+const getDefaultNoteHtml = require('./default_note_html');
+const paths = require('../common/paths');
 const { getCurrentLang } = require('../i18n');
-const { WizInternalError } = require('../share/error');
 
 const fs = global.wizWrapper.fs;
 

@@ -1,4 +1,4 @@
-const { WizTimeoutError } = require('../share/error');
+const { WizTimeoutError } = require('wiznote-sdk-js-share').error;
 
 /**
  * A mutex lock for coordination across async functions

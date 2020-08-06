@@ -1,8 +1,8 @@
 const assert = require('assert');
 const URL = require('url');
 const WizRequest = require('../common/request');
-const versionUtils = require('../share/version');
-const { WizServerError } = require('../share/error');
+const versionUtils = require('wiznote-sdk-js-share').version;
+const { WizServerError } = require('wiznote-sdk-js-share').error;
 
 class AccountServer {
   // login

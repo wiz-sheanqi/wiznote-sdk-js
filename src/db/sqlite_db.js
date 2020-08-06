@@ -1,6 +1,6 @@
 const assert = require('assert');
 const AwaitLock = require('../common/await_lock');
-const { WizInternalError } = require('../share/error');
+const { WizInternalError } = require('wiznote-sdk-js-share').error;
 const updateDb = require('./update_db');
 //
 const { sqlite3, fs } = global.wizWrapper;

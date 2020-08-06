@@ -3,7 +3,7 @@ const assert = require('assert');
 const i18next = require('i18next');
 const { app } = global.wizWrapper;
 
-const { WizNetworkError, WizInternalError, WizKnownError } = require('../share/error');
+const { WizNetworkError, WizInternalError, WizKnownError } = require('wiznote-sdk-js-share').error;
 
 
 function getContentLengthFromHeaders(headers) {
