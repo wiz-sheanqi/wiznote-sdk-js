@@ -176,6 +176,7 @@ const wizApi = {
   core: {
     paths: require('./common/paths'),
     utils: require('./utils'),
+    request: require('./common/request'),
   }
 }
 
