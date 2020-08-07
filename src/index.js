@@ -147,7 +147,7 @@ function registerListener(userGuid, listener) {
 }
 
 function unregisterListener(listener) {
-  user.unregisterListener(listener);
+  users.unregisterListener(listener);
 }
 
 function downloadNoteResource(userGuid, kbGuid, noteGuid, resName) {
