@@ -107,7 +107,7 @@ class AccountServer {
         url: `${server}/manage/server/version`,
       };
       const version = await WizRequest.standardRequest(options);
-      if (versionUtils.compareVersion(version, '1.0.24') < 0) {
+      if (versionUtils.compareVersion(version, '1.0.25') < 0) {
         throw new WizServerError('Server update needed', 'WizErrorUpdateServer');
       }
     } catch (err) {
