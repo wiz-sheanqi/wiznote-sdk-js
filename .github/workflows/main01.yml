@@ -1,11 +1,11 @@
 on:
   push:
     paths:
-      - './package.json'
+      - 'package.json'
       - 'src/*.js'
       - 'index.js'
 
-name: PublishToNPM_Test
+name: PublishToNPM
 jobs:
 
   publish:
