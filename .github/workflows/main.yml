@@ -4,7 +4,7 @@ on:
       - './package.json'
   #  tags:
   #    - 'v*'  # 这段的意思是仅在出现名为 w 字符开头的tag时，触发此任务，如v1.2.1
-name: Publish
+name: PublishToNPM
 jobs:
   # test: # test任务可选，视情况决定是否添加
   #   runs-on: ubuntu-latest
