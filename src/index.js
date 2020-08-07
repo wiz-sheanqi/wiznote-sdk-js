@@ -89,19 +89,19 @@ async function addImageFromUrl(userGuid, kbGuid, noteGuid, url, options) {
   return result;
 }
 
-async function getSettings( key, defaultValue) {
+function getSettings( key, defaultValue) {
   return globalSettings.getSettings(key, defaultValue);
 }
 
-async function setSettings( key, value) {
+function setSettings( key, value) {
   globalSettings.setSettings(key, value);
 }
 
-async function getUserSettings( userGuid, key, defaultValue) {
+function getUserSettings( userGuid, key, defaultValue) {
   return users.getSettings(userGuid, key, defaultValue);
 }
 
-async function setUserSettings( userGuid, key, value) {
+function setUserSettings( userGuid, key, value) {
   users.setSettings(userGuid, key, value);
 }
 
