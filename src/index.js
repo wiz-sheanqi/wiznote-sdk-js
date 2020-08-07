@@ -184,6 +184,7 @@ const wizApi = {
     paths: require('./common/paths'),
     utils: require('./utils'),
     request: require('./common/request'),
+    lockers: require('./common/lockers'),
   }
 }
 
