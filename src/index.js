@@ -153,6 +153,10 @@ function downloadNoteResource(userGuid, kbGuid, noteGuid, resName) {
   users.downloadNoteResource(userGuid, kbGuid, noteGuid, resName);
 }
 
+function emitEvent(userGuid, eventName, ...args) {
+  users.emitEvent(userGuid, eventName, ...args);
+}
+
 const wizApi = {
   registerListener,
   unregisterListener,
@@ -185,6 +189,7 @@ const wizApi = {
   getUserSettings,
   refreshUserInfo,
   downloadNoteResource,
+  emitEvent,
   core: {
     paths: require('./common/paths'),
     utils: require('./utils'),
