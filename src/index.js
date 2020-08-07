@@ -7,8 +7,12 @@ const globalSettings = require('./settings/global_settings');
 
 assert(global.wizWrapper, 'wizWrapper must be initialized before using wiznote sdk');
 
-function i18nInit(resources) {
-  i18n.i18nInit(resources);
+async function i18nInit(resources) {
+  await i18n.i18nInit(resources);
+}
+
+function getCurrentLang() {
+  return i18n.getCurrentLang();
 }
 
 async function getAllUsers() {
@@ -167,6 +171,7 @@ function emitEvent(userGuid, eventName, ...args) {
 
 const wizApi = {
   i18nInit,
+  getCurrentLang,
   registerListener,
   unregisterListener,
   getAllUsers,
