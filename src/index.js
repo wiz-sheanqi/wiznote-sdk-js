@@ -161,8 +161,8 @@ function unregisterListener(listener) {
   users.unregisterListener(listener);
 }
 
-function downloadNoteResource(userGuid, kbGuid, noteGuid, resName) {
-  users.downloadNoteResource(userGuid, kbGuid, noteGuid, resName);
+async function downloadNoteResource(userGuid, kbGuid, noteGuid, resName) {
+  await users.downloadNoteResource(userGuid, kbGuid, noteGuid, resName);
 }
 
 function emitEvent(userGuid, eventName, ...args) {
