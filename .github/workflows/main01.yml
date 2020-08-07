@@ -2,10 +2,8 @@ on:
   push:
     paths:
       - 'package.json'
-      - 'src/*.js'
-      - 'index.js'
 
-name: PublishToNPM
+name: NPM_Publish
 jobs:
 
   publish:
