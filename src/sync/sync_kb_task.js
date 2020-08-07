@@ -270,7 +270,7 @@ class SyncKbTask extends EventEmitter {
 
   async downloadNoteResource(noteGuid, resName) {
     const data = await this._ks.downloadNoteResource(noteGuid, resName);
-    noteData.writeNoteResource(this._user.userGuid, this._kbGuid, noteGuid, resName, data);
+    await noteData.writeNoteResource(this._user.userGuid, this._kbGuid, noteGuid, resName, data);
   }
 }
 
