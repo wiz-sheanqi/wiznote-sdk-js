@@ -3,8 +3,13 @@ const users = require('./user/users');
 
 assert(global.wizWrapper, 'wizWrapper must be initialized before using wiznote sdk');
 
-async function getUsers() {
+async function getAllUsers() {
   const ret = await users.getUsers();
+  return ret;
+}
+
+async function getUserData(userGuid) {
+  const ret = await users.getUserData(userGuid);
   return ret;
 }
 
@@ -147,7 +152,8 @@ function unregisterListener(listener) {
 const wizApi = {
   registerListener,
   unregisterListener,
-  getUsers,
+  getAllUsers,
+  getUserData,
   signUp,
   onlineLogin,
   localLogin,
