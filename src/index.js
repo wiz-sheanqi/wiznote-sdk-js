@@ -1,8 +1,15 @@
 const assert = require('assert');
+const i18next = require('i18next');
+
+const i18n = require('./i18n');
 const users = require('./user/users');
 const globalSettings = require('./settings/global_settings');
 
 assert(global.wizWrapper, 'wizWrapper must be initialized before using wiznote sdk');
+
+function i18nInit(resources) {
+  i18n.i18nInit(resources);
+}
 
 async function getAllUsers() {
   const ret = await users.getUsers();
@@ -159,6 +166,7 @@ function emitEvent(userGuid, eventName, ...args) {
 }
 
 const wizApi = {
+  i18nInit,
   registerListener,
   unregisterListener,
   getAllUsers,
@@ -196,6 +204,7 @@ const wizApi = {
     utils: require('./utils'),
     request: require('./common/request'),
     lockers: require('./common/lockers'),
+    i18next,
   }
 }
 
