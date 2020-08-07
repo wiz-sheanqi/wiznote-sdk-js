@@ -149,6 +149,10 @@ function unregisterListener(listener) {
   user.unregisterListener(listener);
 }
 
+function downloadNoteResource(userGuid, kbGuid, noteGuid, resName) {
+  users.downloadNoteResource(userGuid, kbGuid, noteGuid, resName);
+}
+
 const wizApi = {
   registerListener,
   unregisterListener,
@@ -180,6 +184,7 @@ const wizApi = {
   hasNotesInTrash,
   getUserSettings,
   refreshUserInfo,
+  downloadNoteResource,
   core: {
     paths: require('./common/paths'),
     utils: require('./utils'),
