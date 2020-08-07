@@ -1,5 +1,6 @@
 const assert = require('assert');
 const users = require('./user/users');
+const globalSettings = require('./settings/global_settings');
 
 assert(global.wizWrapper, 'wizWrapper must be initialized before using wiznote sdk');
 
