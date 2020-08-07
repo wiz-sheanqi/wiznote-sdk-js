@@ -1,10 +1,9 @@
 require('./node_wrapper');
-
-const sdk = require('../');
+const sdk = require('../src');
 
 (async () => {
   try {
-    const allUsers = await sdk.getUsers()
+    const allUsers = await sdk.getAllUsers()
     console.log(allUsers);
     //
     let user = await sdk.localLogin();
