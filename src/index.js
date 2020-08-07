@@ -154,6 +154,7 @@ const wizApi = {
   unregisterListener,
   getAllUsers,
   getUserData,
+  getUserInfo,
   signUp,
   onlineLogin,
   localLogin,
