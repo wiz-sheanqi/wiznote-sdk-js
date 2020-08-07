@@ -9,7 +9,7 @@
     "url": "git+https://github.com/WizTeam/wiznote-sdk-js.git"
   },
   "keywords": [
-    "wiznote", "wiznoteSdk"
+    "wiznote"
   ],
   "author": "WizTeam",
   "license": "MIT",
