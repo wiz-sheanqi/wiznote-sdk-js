@@ -72,6 +72,11 @@ class KnowledgeServer extends ServerBase {
     data.kbGuid = this._kbGuid;
     data.infoModified = data.created;
     data.dataModified = data.modified;
+    // add size property to resource
+    for (const resource of resources) {
+      const { size } = await fs.stat(path.join(resourcePath, resource.name));
+      resource.size = size;
+    }
     //
     const result = await this.request({
       token: this._user.token,
