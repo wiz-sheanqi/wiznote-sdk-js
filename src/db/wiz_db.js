@@ -224,6 +224,11 @@ class WizDb extends EventEmitter {
     if (!options.searchText) {
       values.push(start, count);
       const notes = await this._getNotes(`where ${sqlWhere} limit ?, ?`, values);
+      if (!options.withText) {
+        notes.forEach((note) => {
+          delete note.text;
+        });
+      }
       return notes;
     }
     //
@@ -263,6 +268,12 @@ class WizDb extends EventEmitter {
       //
       result.push(note);
     });
+    //
+    if (!options.withText) {
+      result.forEach((note) => {
+        delete note.text;
+      });
+    }
     //
     return result;
   }
