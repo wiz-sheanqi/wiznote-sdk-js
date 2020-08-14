@@ -72,7 +72,9 @@ class KnowledgeServer extends ServerBase {
     data.kbGuid = this._kbGuid;
     data.infoModified = data.created;
     data.dataModified = data.modified;
+
     // add size property to resource
+    const resources = result.resources;
     for (const resource of resources) {
       const { size } = await fs.stat(path.join(resourcePath, resource.name));
       resource.size = size;
@@ -86,7 +88,6 @@ class KnowledgeServer extends ServerBase {
       returnFullResult: true,
     });
     //
-    const resources = result.resources;
     if (resources && resources.length > 0) {
       for (let i = 0; i < resources.length; i++) {
         const isLast = i === resources.length - 1;
