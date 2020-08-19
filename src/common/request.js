@@ -15,12 +15,11 @@ function getContentLengthFromHeaders(headers) {
   }
   return -1;
 }
-
 //
 async function standardRequest(opt) {
   //
   const options = opt;
-  assert(options);
+  assert(options, 'no options');
   //
   const token = options.token;
   //
@@ -46,7 +45,12 @@ async function standardRequest(opt) {
   }
   //
   try {
-    const result = await axios(options);
+    let result;
+    if (options.method === 'post' && options.useAppPost && app.doStandardPost) {
+      result = await app.doStandardPost(options);
+    } else {
+      result = await axios(options);
+    }
     if (result.status !== 200) {
       throw new WizNetworkError(result.statusText);
     }

@@ -3,6 +3,7 @@ const path = require('path');
 const ServerBase = require('./server_base');
 const paths = require('../common/paths');
 const { WizNotExistsError } = require('wiznote-sdk-js-share').error;
+const mime = require('mime-types');
 
 const { fs } = global.wizWrapper;
 
@@ -47,12 +48,29 @@ class KnowledgeServer extends ServerBase {
       formData.append('objType', 'resource');
       formData.append('objId', resName);
       formData.append('isLast', isLast ? 1 : 0);
-      formData.append('data', fs.createReadStream(resPath), {
-        filename: resName,
-      });
+      //
+      let useAppPost = false;
+      if (fs.createReadStream) {
+        formData.append('data', fs.createReadStream(resPath), {
+          filename: resName,
+        });
+      } else {
+        useAppPost = true;
+        const type = mime.lookup(resName);
+        formData.append('data', {
+          path: resPath,
+          type, 
+          filename: resName,
+       });
+      }
+      //
+      let customHeaders = {};
+      if (formData.getHeaders) {
+        customHeaders = formData.getHeaders();
+      }
       //
       const headers = {
-        ...formData.getHeaders(),
+        ...customHeaders,
       };
       const result = await this.request({
         token: this._user.token,
@@ -60,6 +78,7 @@ class KnowledgeServer extends ServerBase {
         url: `${this._serverUrl}/ks/object/upload/${this._kbGuid}/${note.guid}?`,
         headers,
         data: formData,
+        useAppPost,
         returnFullResult: true,
       });
       //
