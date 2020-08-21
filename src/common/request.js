@@ -15,6 +15,25 @@ function getContentLengthFromHeaders(headers) {
   }
   return -1;
 }
+
+function getErrorFromHeaders(headers) {
+  let code;
+  let externCode;
+  for (const key of Object.keys(headers)) {
+    const lowerCaseKey = key.toLowerCase();
+    if (lowerCaseKey === 'x-wiz-code') {
+      code = Number.parseInt(headers[key], 10);
+    } else if (lowerCaseKey === 'x-wiz-code') {
+      externCode = headers[key];
+    }
+  }
+  //
+  if (code) {
+    return new WizKnownError('server error', code, externCode);
+  }
+  return null;
+}
+
 //
 async function standardRequest(opt) {
   //
@@ -52,6 +71,11 @@ async function standardRequest(opt) {
       result = await axios(options);
     }
     if (result.status !== 200) {
+      const error = getErrorFromHeaders(result.headers);
+      if (error) {
+        throw error;
+      }
+
       throw new WizNetworkError(result.statusText);
     }
     //
@@ -68,7 +92,7 @@ async function standardRequest(opt) {
       const headerContentLength = getContentLengthFromHeaders(result.headers);
       if (headerContentLength !== -1) {
         if (data.length !== headerContentLength) {
-          throw new WizNetworkError(`Failed to download data, invalid content length: ${data.length}, ${result.contentLength}`);
+          throw new WizNetworkError(`Failed to download data, invalid content length: ${data.length}, ${headerContentLength}`);
         }
       }
     }
@@ -78,6 +102,13 @@ async function standardRequest(opt) {
     }
     return data.result;
   } catch (err) {
+    if (err.response) {
+      const headers = err.response.headers;
+      const error = getErrorFromHeaders(headers);
+      if (error) {
+        throw error;
+      }
+    }
     if (err.code === 'ENOTFOUND') {
       throw new WizNetworkError(i18next.t('errorConnect', {
         host: err.hostname,
