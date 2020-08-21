@@ -89,9 +89,16 @@ async function standardRequest(opt) {
         throw new WizKnownError(data.returnMessage, data.returnCode, data.externCode);
       }
     } else {
+      let byteLength;
+      if (typeof navigator != 'undefined' && navigator.product == 'ReactNative') {
+        if (result.data.constructor === ArrayBuffer) {
+          byteLength = result.data.byteLength;
+        }
+      }
       const headerContentLength = getContentLengthFromHeaders(result.headers);
+      const dataLength = byteLength || data.length;
       if (headerContentLength !== -1) {
-        if (data.length !== headerContentLength) {
+        if (dataLength !== headerContentLength) {
           throw new WizNetworkError(`Failed to download data, invalid content length: ${data.length}, ${headerContentLength}`);
         }
       }
