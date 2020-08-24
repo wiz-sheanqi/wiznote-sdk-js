@@ -16,19 +16,22 @@ function getContentLengthFromHeaders(headers) {
   return -1;
 }
 
-function getErrorFromHeaders(headers) {
+function getErrorFromHeaders(headers, options) {
   let code;
   let externCode;
   for (const key of Object.keys(headers)) {
     const lowerCaseKey = key.toLowerCase();
     if (lowerCaseKey === 'x-wiz-code') {
       code = Number.parseInt(headers[key], 10);
-    } else if (lowerCaseKey === 'x-wiz-code') {
+    } else if (lowerCaseKey === 'x-wiz-externcode') {
       externCode = headers[key];
     }
   }
   //
   if (code) {
+    if (code === 2000) {
+      console.error(`invalid param: ${options.url}`);
+    }
     return new WizKnownError('server error', code, externCode);
   }
   return null;
@@ -71,7 +74,7 @@ async function standardRequest(opt) {
       result = await axios(options);
     }
     if (result.status !== 200) {
-      const error = getErrorFromHeaders(result.headers);
+      const error = getErrorFromHeaders(result.headers, options);
       if (error) {
         throw error;
       }
@@ -111,7 +114,7 @@ async function standardRequest(opt) {
   } catch (err) {
     if (err.response) {
       const headers = err.response.headers;
-      const error = getErrorFromHeaders(headers);
+      const error = getErrorFromHeaders(headers, options);
       if (error) {
         throw error;
       }
