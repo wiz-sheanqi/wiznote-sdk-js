@@ -195,7 +195,8 @@ class Users {
   async createNote(userGuid, kbGuid, note) {
     const userData = this.getUserData(userGuid);
     const db = await userData.getDb(kbGuid);
-    await db.createNote(note);
+    const newNote = await db.createNote(note);
+    return newNote;
   }
 
   async deleteNote(userGuid, kbGuid, noteGuid) {
