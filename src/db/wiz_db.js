@@ -340,7 +340,7 @@ class WizDb extends EventEmitter {
     }
     this.emit('deleteNotes', [noteGuid], {
       permanentDelete: false,
-    });
+    }, [note]);
     return note;
   }
 
@@ -350,7 +350,7 @@ class WizDb extends EventEmitter {
     if (!note) {
       return null;
     }
-    this.emit('putBackNotes', [noteGuid]);
+    this.emit('putBackNotes', [noteGuid], [note]);
     return note;
   }
 
