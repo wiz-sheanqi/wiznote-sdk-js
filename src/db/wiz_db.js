@@ -358,9 +358,16 @@ class WizDb extends EventEmitter {
 
   async deletedFromTrash(noteGuid) {
     //
+    const note = await this.getNote(noteGuid);
+    if (!note) {
+      return;
+    }
     this.emit('deleteNotes', [noteGuid], {
       permanentDelete: true,
     });
+    note.trash = 1;
+    note.deleted = 1;
+    this.emit('modifyNote', note);
     //
     const sql = `update wiz_note set trash=1, deleted=1 where guid=?`;
     const values = [noteGuid];
