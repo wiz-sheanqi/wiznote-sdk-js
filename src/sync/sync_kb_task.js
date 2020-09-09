@@ -84,9 +84,7 @@ class SyncKbTask extends EventEmitter {
     //
     const notes = await this._db.getModifiedNotes();
     //
-    const failedNotes = [];
-    for (const note of notes) {
-      //
+    const uploadNote = async (note) => {
       let flags = '';
       if (note.trash) {
         flags += FLAGS_IN_TRASH;
@@ -120,12 +118,18 @@ class SyncKbTask extends EventEmitter {
         note.resources = noteData.getResourcesFromHtml(note.html);
       }
       //
+      const version = await this._ks.uploadNote(note);
+      note.version = version;
+      note.lastSynced = new Date().valueOf();
+      const resultNote = await this._db.setNoteVersion(note.guid, version);
+      this.emit('uploadNote', this, resultNote);
+    }
+    //
+    const failedNotes = [];
+    for (const note of notes) {
+      //
       try {
-        const version = await this._ks.uploadNote(note);
-        note.version = version;
-        note.lastSynced = new Date().valueOf();
-        const resultNote = await this._db.setNoteVersion(note.guid, version);
-        this.emit('uploadNote', this, resultNote);
+        await uploadNote(note);
       } catch (err) {
         //
         if (err.code === 'WizErrorInvalidPassword'
@@ -134,6 +138,16 @@ class SyncKbTask extends EventEmitter {
           throw err;
         }
         //
+        if (err.externCode === 'WizErrorUploadNoteData') {
+          note.version = -2;
+          try {
+            console.error(`should upload note data: ${note.title}`);
+            await uploadNote(note);
+            continue;
+          } catch (err) {
+            console.error(err);
+          }
+        }
         console.error(err);
         failedNotes.push(note.title);
       }
