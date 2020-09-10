@@ -161,7 +161,7 @@ class SyncKbTask extends EventEmitter {
     const deletedObjects = deletedNotes.map((note) => ({
       deletedGuid: note.guid,
       type: 'document',
-      created: note.deleted,
+      created: Date.now(),
     }));
     //
     await this._ks.uploadDeletedObjects(deletedObjects);
