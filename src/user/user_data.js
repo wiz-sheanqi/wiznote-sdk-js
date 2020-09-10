@@ -143,8 +143,13 @@ class UserData extends EventEmitter {
     const resourcePath = paths.getNoteResources(this.userGuid, kbGuid, noteGuid);
     await fs.ensureDir(resourcePath);
     const u = URL.parse(url);
-    if (u.protocol === 'file') {
-      const file = u.path;
+    if (u.protocol === 'file' || u.protocol === 'file:') {
+      let file;
+      if (URL.fileURLToPath) {
+        file = URL.fileURLToPath(u);
+      } else {
+        file = u.path;
+      }
       if (file.startsWith(resourcePath)) {
         const imageName = path.basename(file);
         return `index_files/${imageName}`;
