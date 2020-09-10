@@ -16,6 +16,10 @@ class KnowledgeServer extends ServerBase {
     this._user = user;
   }
 
+  _onTokenUpdated(token) {
+    console.log('token updated');
+    this._user.token = token;
+  }
   //
   static _getMaxVersion(objects, start) {
     let max = start;

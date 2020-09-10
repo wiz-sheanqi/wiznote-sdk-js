@@ -12,9 +12,15 @@ class ServerBase {
   async refreshToken() {
     if (this._invalidTokenHandler) {
       const token = await this._invalidTokenHandler();
+      if (token) {
+        this._onTokenUpdated(token);
+      }
       return token;
     }
     return null;
+  }
+
+  _onTokenUpdated(token) {
   }
 
   async request(options) {

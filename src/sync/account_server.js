@@ -136,6 +136,13 @@ class AccountServer {
       throw err;
     }
   }
+
+  _onTokenUpdated(token) {
+    console.log('token updated');
+    if (this._user) {
+      this._user.token = token;
+    }
+  }
 }
 
 module.exports = AccountServer;
