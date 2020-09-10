@@ -147,6 +147,7 @@ class WizDb extends EventEmitter {
   async _getNotes(sqlWhere, values) {
     const sql = `select * from wiz_note ${sqlWhere}`;
     const notes = await this._sqlite.all(sql, values);
+    const kbGuid = this.getKbGuid();
     for (const note of notes) {
       note.fileType = note.file_type;
       note.attachmentCount = note.attachment_count;
@@ -154,6 +155,7 @@ class WizDb extends EventEmitter {
       note.localStatus = note.local_status;
       note.onTop = note.on_top;
       note.lastSynced = note.last_synced;
+      note.kbGuid = kbGuid;
       //
       delete note.file_type;
       delete note.attachment_count;
