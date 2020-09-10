@@ -110,7 +110,7 @@ class UserData extends EventEmitter {
     return this._listeners;
   }
 
-  async addImageFromData(kbGuid, noteGuid, data) {
+  async addImageFromData(kbGuid, noteGuid, data, options) {
     const type = imageType(data);
     if (!type) {
       throw new WizInvalidParamError('Unknown image type');
@@ -134,7 +134,7 @@ class UserData extends EventEmitter {
       data = toBuffer(data);
     }
     //
-    await fs.writeFile(imageName, data);
+    await fs.writeFile(imageName, data, options);
     return `index_files/${newName}`;
   }
 
