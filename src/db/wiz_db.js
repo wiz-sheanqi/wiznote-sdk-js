@@ -809,6 +809,7 @@ class WizDb extends EventEmitter {
     //
     this.emit('newNote', note, this);
     //
+    note.kbGuid = await this.getKbGuid();
     return note;
   }
 
