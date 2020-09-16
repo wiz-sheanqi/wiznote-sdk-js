@@ -20,8 +20,8 @@ async function getAllUsers() {
   return ret;
 }
 
-async function getUserData(userGuid) {
-  const ret = await users.getUserData(userGuid);
+function getUserData(userGuid) {
+  const ret = users.getUserData(userGuid);
   return ret;
 }
 
