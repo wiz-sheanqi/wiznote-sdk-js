@@ -116,6 +116,7 @@ class WizDb extends EventEmitter {
     try {
       user.password = enc.aes.decryptText(await this.getMeta('password'), user.userGuid);
     } catch (err) {
+      console.error(err);
       user.password = '';
     }
     return user;
