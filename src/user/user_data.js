@@ -111,7 +111,12 @@ class UserData extends EventEmitter {
   }
 
   async addImageFromData(kbGuid, noteGuid, data, options) {
-    const type = imageType(data);
+    let type;
+    if (options && options.type) {
+      type = options.type;
+    } else {
+      type = imageType(data);
+    }
     if (!type) {
       throw new WizInvalidParamError('Unknown image type');
     }
