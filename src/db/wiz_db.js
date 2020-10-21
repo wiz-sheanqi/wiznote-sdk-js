@@ -226,7 +226,7 @@ class WizDb extends EventEmitter {
     const sqlWhere = conditions.join(' and ');
     if (!options.searchText) {
       values.push(start, count);
-      const notes = await this._getNotes(`where ${sqlWhere} limit ?, ?`, values);
+      const notes = await this._getNotes(`where ${sqlWhere} order by modified desc limit ?, ?`, values);
       if (!options.withText) {
         notes.forEach((note) => {
           delete note.text;
