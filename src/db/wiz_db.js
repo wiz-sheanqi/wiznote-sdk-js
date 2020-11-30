@@ -281,9 +281,9 @@ class WizDb extends EventEmitter {
     return result;
   }
 
-  async getAllTitle() {
-    const sql = 'select guid,title from wiz_note where order by modified desc';
-    const notes = await this._sqlite.all(sql);
+  async getAllTitles() {
+    const sql = 'select guid,title from wiz_note order by modified desc';
+    const notes = await this._sqlite.all(sql, []);
     return notes;
   }
 

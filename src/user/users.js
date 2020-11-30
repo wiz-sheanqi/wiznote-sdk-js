@@ -266,6 +266,7 @@ class Users {
     const userData = this.getUserData(userGuid);
     const db = await userData.getDb(kbGuid);
     const res = await db.getAllTitles();
+    return res;
   }
 
   async getNote(userGuid, kbGuid, noteGuid, options) {
