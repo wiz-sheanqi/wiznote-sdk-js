@@ -432,7 +432,7 @@ class WizDb extends EventEmitter {
         starred, archived, on_top, trash) 
         values (?, ?, ?,
           ?, ?, ?,
-          ?, ?, ?, ?,
+          ?, ?, ?, ?, ?,
           ?, ?, ?, ?, ?, ?, ?, ?,
           ?, ?, ?, ?
         )`;
@@ -782,14 +782,14 @@ class WizDb extends EventEmitter {
     //
     const sql = `insert into wiz_note(guid, title, category, 
       name, seo, url,
-      tags, note_links owner, type, file_type, 
+      tags, note_links, owner, type, file_type, 
       created, modified, encrypted, attachment_count,
       data_md5, version, local_status, abstract, text,
       starred, archived, on_top, trash
       ) 
       values (?, ?, ?,
         ?, ?, ?,
-        ?, ?, ?, ?,
+        ?, ?, ?, ?, ?,
         ?, ?, ?, ?,
         ?, ?, ?, ?, ?,
         ?, ?, ?, ?
@@ -850,8 +850,8 @@ class WizDb extends EventEmitter {
 
   async getLinkToNotes(noteGuid) {
     const note = await this.getNote(noteGuid);
-    const sql = "select guid,title from wiz_note where note_links=? or note_links like '%|?' or note_links like '%|?|%' or note_links like '?|%' or note_links=? or note_links like '%|?' or note_links like '%|?|%' or note_links like '?|%'";
-    const value = [noteGuid, noteGuid, noteGuid, noteGuid, note.title, note.title, note.title, note.title];
+    const sql = 'select guid,title from wiz_note where note_links=? or note_links like ? or note_links like ? or note_links like ? or note_links=? or note_links like ? or note_links like ? or note_links like ?';
+    const value = [noteGuid, `%|${noteGuid}`, `%|${noteGuid}|%`, `${noteGuid}|%`, note.title, `%|${note.title}`, `%|${note.title}|%`, `${note.title}|%`,];
     const notes = await this._sqlite.all(sql, value);
     return notes;
   }

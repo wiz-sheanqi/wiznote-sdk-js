@@ -14,7 +14,7 @@ const SqlCommands = [
          seo                   varchar(300),
          url                   varchar(2048),
          tags                  varchar(300),
-         note_links             varchar(2048),
+         note_links            varchar(2048),
          owner                 varchar(150),
          type                  varchar(20),
          file_type             varchar(20),
