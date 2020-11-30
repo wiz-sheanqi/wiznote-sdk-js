@@ -426,7 +426,7 @@ class WizDb extends EventEmitter {
     if (!old) {
       const sql = `insert into wiz_note(guid, title, category, 
         name, seo, url,
-        tags, owner, type, file_type, 
+        tags, note_links, owner, type, file_type, 
         created, modified, encrypted, attachment_count,
         data_md5, version, local_status, abstract,
         starred, archived, on_top, trash) 
@@ -439,7 +439,7 @@ class WizDb extends EventEmitter {
       //
       const values = [note.guid, note.title, note.category || '/Lite/',
         note.name, note.seo, note.url,
-        note.tags, note.owner, note.type, note.fileType,
+        note.tags, note.noteLinks, note.owner, note.type, note.fileType,
         note.created, note.dataModified, note.encrypted, note.attachmentCount,
         note.dataMd5, note.version, 0, note.abstract,
         note.starred, note.archived, note.onTop, note.trash];
@@ -633,7 +633,7 @@ class WizDb extends EventEmitter {
       const reg = new RegExp(`#${from}`, 'ig');
       const modifiedMarkdown = markdown.replace(reg, `#${to}`);
       if (markdown !== modifiedMarkdown) {
-        await this.setNoteMarkdown(note.guid, modifiedMarkdown, options);
+        await this.setNoteMarkdown(note.guid, modifiedMarkdown, [], options);
         renamed = true;
       }
     }
@@ -661,7 +661,7 @@ class WizDb extends EventEmitter {
   }
 
   //
-  async setNoteMarkdown(noteGuid, markdown, options = {}) {
+  async setNoteMarkdown(noteGuid, markdown, noteLinks = [], options = {}) {
     const note = await this.getNote(noteGuid);
     note.version = VERSION_DATA_CHANGED;
     note.localStatus = LOCAL_STATUS_DOWNLOADED;
@@ -679,9 +679,9 @@ class WizDb extends EventEmitter {
     note.title = title;
     note.abstract = abstract;
     //
-    const sql = `update wiz_note set title=?, version=?, local_status=?, data_md5=?, modified=?, abstract=?, text=? where guid=?`;
+    const sql = `update wiz_note set title=?, version=?, local_status=?, data_md5=?, modified=?, abstract=?, text=?, note_links=? where guid=?`;
     const values = [note.title, note.version, note.localStatus, note.dataMd5,
-      note.modified, note.abstract, note.text, noteGuid];
+      note.modified, note.abstract, note.text, [...new Set(noteLinks)].join('|'), noteGuid];
     await this._sqlite.run(sql, values);
     note.markdown = markdown;
     //
@@ -782,7 +782,7 @@ class WizDb extends EventEmitter {
     //
     const sql = `insert into wiz_note(guid, title, category, 
       name, seo, url,
-      tags, owner, type, file_type, 
+      tags, note_links owner, type, file_type, 
       created, modified, encrypted, attachment_count,
       data_md5, version, local_status, abstract, text,
       starred, archived, on_top, trash
@@ -802,11 +802,12 @@ class WizDb extends EventEmitter {
       created, modified, encrypted, attachmentCount,
       dataMd5, version, localStatus, abstract, text,
       starred, archived, onTop, trash,
+      noteLinks
     } = note;
     //
     const values = [guid, title, category,
       name, seo, url,
-      tags, owner, type, fileType,
+      tags, noteLinks, owner, type, fileType,
       created, modified, encrypted, attachmentCount,
       dataMd5, version, localStatus, abstract, text,
       starred, archived, onTop, trash];
@@ -845,6 +846,14 @@ class WizDb extends EventEmitter {
     note.starred = starred;
     this.emit('modifyNote', note);
     //
+  }
+
+  async getLinkToNotes(noteGuid) {
+    const note = await this.getNote(noteGuid);
+    const sql = "select guid,title from wiz_note where note_links=? or note_links like '%|?' or note_links like '%|?|%' or note_links like '?|%' or note_links=? or note_links like '%|?' or note_links like '%|?|%' or note_links like '?|%'";
+    const value = [noteGuid, noteGuid, noteGuid, noteGuid, note.title, note.title, note.title, note.title];
+    const notes = await this._sqlite.all(sql, value);
+    return notes;
   }
 
   async hasNotesInTrash() {
