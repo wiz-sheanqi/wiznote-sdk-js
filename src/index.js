@@ -55,6 +55,10 @@ async function queryNotes(userGuid, kbGuid, start, count, options = {}) {
   return notes;
 }
 
+function getAllTitles (userGuid, kbGuid) {
+  return await users.getAllTitles(userGuid, kbGuid);
+}
+
 async function getNote(userGuid, kbGuid, noteGuid, options) {
   const result = await users.getNote(userGuid, kbGuid, noteGuid, options);
   return result;
@@ -204,6 +208,7 @@ const wizApi = {
   refreshUserInfo,
   downloadNoteResource,
   emitEvent,
+  getAllTitles,
   core: {
     paths: require('./common/paths'),
     utils: require('./utils'),

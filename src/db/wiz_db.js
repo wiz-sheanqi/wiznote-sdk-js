@@ -281,6 +281,12 @@ class WizDb extends EventEmitter {
     return result;
   }
 
+  async getAllTitle() {
+    const sql = 'select guid,title from wiz_note where order by modified desc';
+    const notes = await this._sqlite.all(sql);
+    return notes;
+  }
+
   async getNotesByGuid(noteGuidArr) {
     const guidData = [noteGuidArr.map((guid) => `'${guid}'`).join(', ')];
     const sqlWhere = `where guid in (${guidData}) and (deleted is null or deleted = 0)`;
