@@ -55,7 +55,7 @@ async function queryNotes(userGuid, kbGuid, start, count, options = {}) {
   return notes;
 }
 
-function getAllTitles (userGuid, kbGuid) {
+async function getAllTitles (userGuid, kbGuid) {
   return await users.getAllTitles(userGuid, kbGuid);
 }
 
