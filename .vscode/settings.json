@@ -2,5 +2,8 @@
   "cSpell.words": [
     "wiznote"
   ],
-  "git.ignoreLimitWarning": true
+  "git.ignoreLimitWarning": true,
+  "eslint.options": {
+    "configFile":".eslintrc.json"
+  },
 }

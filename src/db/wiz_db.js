@@ -282,8 +282,11 @@ class WizDb extends EventEmitter {
   }
 
   async getAllTitles() {
-    const sql = 'select guid,title from wiz_note order by modified desc';
+    const sql = 'select guid,title,tags,modified from wiz_note order by modified desc';
     const notes = await this._sqlite.all(sql, []);
+    notes.forEach((note) => {
+      note.tags = (note.tags?.split('|') ?? []).map((tag) => trim(tag, '#/'))
+    })
     return notes;
   }
 
@@ -426,20 +429,20 @@ class WizDb extends EventEmitter {
     if (!old) {
       const sql = `insert into wiz_note(guid, title, category, 
         name, seo, url,
-        tags, note_links, owner, type, file_type, 
+        tags, owner, type, file_type, 
         created, modified, encrypted, attachment_count,
         data_md5, version, local_status, abstract,
         starred, archived, on_top, trash) 
         values (?, ?, ?,
           ?, ?, ?,
-          ?, ?, ?, ?, ?,
+          ?, ?, ?, ?,
           ?, ?, ?, ?, ?, ?, ?, ?,
           ?, ?, ?, ?
         )`;
       //
       const values = [note.guid, note.title, note.category || '/Lite/',
         note.name, note.seo, note.url,
-        note.tags, note.noteLinks, note.owner, note.type, note.fileType,
+        note.tags, note.owner, note.type, note.fileType,
         note.created, note.dataModified, note.encrypted, note.attachmentCount,
         note.dataMd5, note.version, 0, note.abstract,
         note.starred, note.archived, note.onTop, note.trash];
@@ -593,9 +596,9 @@ class WizDb extends EventEmitter {
   }
 
 
-  async updateNoteLinks(noteGuid, markdown) {
+  async updateNoteLinks(noteGuid, noteLinks) {
     //
-    const links = noteData.extractLinksFromMarkdown(markdown).sort();
+    const links = noteLinks.sort();
     const oldLinks = await this.getNoteLinks(noteGuid);
 
     if (isEqual(links, oldLinks)) {
@@ -676,12 +679,18 @@ class WizDb extends EventEmitter {
     }
     //
     const { title, abstract } = noteData.extractNoteTitleAndAbstractFromText(note.text);
+    if (title !== note.title && await this.fixLinkedName(noteGuid, note.title, title)) {
+      const reg = new RegExp(`[[${note.title}]]`.replace(/[.[*?+^$|()/]|\]|\\/g, '\\$&'), 'g');
+      note.abstract = abstract.replace(reg, `[[${title}]]`);
+    } else {
+      note.abstract = abstract;
+    }
     note.title = title;
-    note.abstract = abstract;
+   
     //
-    const sql = `update wiz_note set title=?, version=?, local_status=?, data_md5=?, modified=?, abstract=?, text=?, note_links=? where guid=?`;
+    const sql = `update wiz_note set title=?, version=?, local_status=?, data_md5=?, modified=?, abstract=?, text=? where guid=?`;
     const values = [note.title, note.version, note.localStatus, note.dataMd5,
-      note.modified, note.abstract, note.text, [...new Set(noteLinks)].join('|'), noteGuid];
+      note.modified, note.abstract, note.text, noteGuid];
     await this._sqlite.run(sql, values);
     note.markdown = markdown;
     //
@@ -691,10 +700,32 @@ class WizDb extends EventEmitter {
       // do nothing
     } else {
       await this.updateNoteTags(noteGuid, markdown);
-      await this.updateNoteLinks(noteGuid, markdown);
+    }
+
+    if (!options.noUpdateLinks) {
+      await this.updateNoteLinks(noteGuid, noteLinks);
     }
     //
     return note;
+  }
+
+  async fixLinkedName(guid, oldTitle, newTitle) {
+    const selectNoteTitlesSql = 'select count(guid) as count from wiz_note where title = ? and guid != ?';
+    const {count} = this._sqlite.firstRow(selectNoteTitlesSql, [oldTitle, guid]);
+    if (count === 0) {
+      const sql = 'select guid, abstract from wiz_note where guid in (select note_guid from wiz_note_links where note_title = ?)'
+      const reg = new RegExp(`[[${oldTitle}]]`.replace(/[.[*?+^$|()/]|\]|\\/g, '\\$&'), 'g');
+      const list = await this._sqlite.all(sql, [oldTitle]);
+  
+      const updateNoteSql = 'update wiz_note set abstract=? where guid=?'
+      await Promise.all(list.filter(item => item.guid !== guid).map(item => this._sqlite.run(updateNoteSql, [tem.abstract.replace(reg, `[[${newTitle}]]`), item.guid])))
+  
+      const updateLinked = 'update wiz_note_links set note_title=? where note_title=?'
+      await this._sqlite.run(updateLinked, [newTitle, oldTitle]);
+
+      return true;
+    }
+    return false;
   }
 
   async getNoteMarkdown(noteGuid) {
@@ -782,14 +813,14 @@ class WizDb extends EventEmitter {
     //
     const sql = `insert into wiz_note(guid, title, category, 
       name, seo, url,
-      tags, note_links, owner, type, file_type, 
+      tags, owner, type, file_type, 
       created, modified, encrypted, attachment_count,
       data_md5, version, local_status, abstract, text,
       starred, archived, on_top, trash
       ) 
       values (?, ?, ?,
         ?, ?, ?,
-        ?, ?, ?, ?, ?,
+        ?, ?, ?, ?,
         ?, ?, ?, ?,
         ?, ?, ?, ?, ?,
         ?, ?, ?, ?
@@ -802,12 +833,11 @@ class WizDb extends EventEmitter {
       created, modified, encrypted, attachmentCount,
       dataMd5, version, localStatus, abstract, text,
       starred, archived, onTop, trash,
-      noteLinks
     } = note;
     //
     const values = [guid, title, category,
       name, seo, url,
-      tags, noteLinks, owner, type, fileType,
+      tags, owner, type, fileType,
       created, modified, encrypted, attachmentCount,
       dataMd5, version, localStatus, abstract, text,
       starred, archived, onTop, trash];
@@ -848,11 +878,13 @@ class WizDb extends EventEmitter {
     //
   }
 
-  async getLinkToNotes(noteGuid) {
-    const note = await this.getNote(noteGuid);
-    const sql = 'select guid,title from wiz_note where note_links=? or note_links like ? or note_links like ? or note_links like ? or note_links=? or note_links like ? or note_links like ? or note_links like ?';
-    const value = [noteGuid, `%|${noteGuid}`, `%|${noteGuid}|%`, `${noteGuid}|%`, note.title, `%|${note.title}`, `%|${note.title}|%`, `${note.title}|%`,];
-    const notes = await this._sqlite.all(sql, value);
+  async getLinkToNotes(title) {
+    // const note = await this.getNote(noteGuid);
+    // const sql = 'select guid,title from wiz_note where note_links=? or note_links like ? or note_links like ? or note_links like ? or note_links=? or note_links like ? or note_links like ? or note_links like ?';
+    // const value = [noteGuid, `%|${noteGuid}`, `%|${noteGuid}|%`, `${noteGuid}|%`, note.title, `%|${note.title}`, `%|${note.title}|%`, `${note.title}|%`,];
+    // const notes = await this._sqlite.all(sql, value);
+    const sql = 'select wiz_note.title, wiz_note.guid from wiz_note_links join wiz_note on (wiz_note.guid = wiz_note_links.note_guid) where wiz_note_links.note_title = ?';
+    const notes = await this._sqlite.all(sql, [title]);
     return notes;
   }
 

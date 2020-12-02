@@ -74,8 +74,8 @@ async function setNoteMarkdown(userGuid, kbGuid, noteGuid, markdown, noteLinks) 
   return result;
 }
 
-async function getLinkToNotes(userGuid, kbGuid, noteGuid) {
-  const result = await users.getLinkToNotes(userGuid, kbGuid, noteGuid);
+async function getLinkToNotes(userGuid, kbGuid, title) {
+  const result = await users.getLinkToNotes(userGuid, kbGuid, title);
   return result;
 }
 
