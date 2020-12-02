@@ -598,7 +598,7 @@ class WizDb extends EventEmitter {
 
   async updateNoteLinks(noteGuid, noteLinks) {
     //
-    const links = noteLinks.sort();
+    const links = [...new Set(noteLinks)].sort();
     const oldLinks = await this.getNoteLinks(noteGuid);
 
     if (isEqual(links, oldLinks)) {
