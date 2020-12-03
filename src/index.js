@@ -69,8 +69,8 @@ async function getNoteMarkdown(userGuid, kbGuid, noteGuid) {
   return result;
 }
 
-async function setNoteMarkdown(userGuid, kbGuid, noteGuid, markdown, noteLinks) {
-  const result = await users.setNoteMarkdown(userGuid, kbGuid, noteGuid, markdown, noteLinks);
+async function setNoteMarkdown(userGuid, kbGuid, noteGuid, markdown) {
+  const result = await users.setNoteMarkdown(userGuid, kbGuid, noteGuid, markdown);
   return result;
 }
 

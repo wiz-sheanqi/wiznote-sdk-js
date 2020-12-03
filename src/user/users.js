@@ -283,10 +283,10 @@ class Users {
     return markdown;
   }
 
-  async setNoteMarkdown(userGuid, kbGuid, noteGuid, markdown, noteLinks) {
+  async setNoteMarkdown(userGuid, kbGuid, noteGuid, markdown) {
     const userData = this.getUserData(userGuid);
     const db = await userData.getDb(kbGuid);
-    await db.setNoteMarkdown(noteGuid, markdown, noteLinks);
+    await db.setNoteMarkdown(noteGuid, markdown);
   }
 
   async getLinkToNotes (userGuid, kbGuid, title) {

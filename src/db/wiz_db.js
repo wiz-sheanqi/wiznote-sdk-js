@@ -596,9 +596,9 @@ class WizDb extends EventEmitter {
   }
 
 
-  async updateNoteLinks(noteGuid, noteLinks) {
+  async updateNoteLinks(noteGuid, markdown) {
     //
-    const links = [...new Set(noteLinks)].sort();
+    const links = noteData.extractLinksFromMarkdown(markdown).sort();
     const oldLinks = await this.getNoteLinks(noteGuid);
 
     if (isEqual(links, oldLinks)) {
@@ -636,7 +636,7 @@ class WizDb extends EventEmitter {
       const reg = new RegExp(`#${from}`, 'ig');
       const modifiedMarkdown = markdown.replace(reg, `#${to}`);
       if (markdown !== modifiedMarkdown) {
-        await this.setNoteMarkdown(note.guid, modifiedMarkdown, [], options);
+        await this.setNoteMarkdown(note.guid, modifiedMarkdown, options);
         renamed = true;
       }
     }
@@ -664,7 +664,7 @@ class WizDb extends EventEmitter {
   }
 
   //
-  async setNoteMarkdown(noteGuid, markdown, noteLinks = [], options = {}) {
+  async setNoteMarkdown(noteGuid, markdown, options = {}) {
     const note = await this.getNote(noteGuid);
     note.version = VERSION_DATA_CHANGED;
     note.localStatus = LOCAL_STATUS_DOWNLOADED;
@@ -703,7 +703,7 @@ class WizDb extends EventEmitter {
     }
 
     if (!options.noUpdateLinks) {
-      await this.updateNoteLinks(noteGuid, noteLinks);
+      await this.updateNoteLinks(noteGuid, markdown);
     }
     //
     return note;
