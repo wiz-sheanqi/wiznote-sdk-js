@@ -289,10 +289,10 @@ class Users {
     await db.setNoteMarkdown(noteGuid, markdown);
   }
 
-  async getLinkToNotes (userGuid, kbGuid, title) {
+  async getBackwardLinkedNotes(userGuid, kbGuid, title) {
     const userData = this.getUserData(userGuid);
     const db = await userData.getDb(kbGuid);
-    return await db.getLinkToNotes(title);
+    return await db.getBackwardLinkedNotes(title);
   }
 
   async downloadNoteResource(userGuid, kbGuid, noteGuid, resName) {

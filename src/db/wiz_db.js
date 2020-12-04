@@ -291,8 +291,8 @@ class WizDb extends EventEmitter {
 
   async getAllTitles() {
     const sql = 'select title from wiz_note order by modified desc';
-    const notes = await this._sqlite.all(sql, []);
-    return notes;
+    const notes = await this._sqlite.all(sql);
+    return notes.map((item) => item.title);
   }
 
   async getNotesByGuid(noteGuidArr) {
@@ -884,7 +884,7 @@ class WizDb extends EventEmitter {
     //
   }
 
-  async getLinkToNotes(title) {
+  async getBackwardLinkedNotes(title) {
     const sql = 'select note_guid as noteGuid from wiz_note_links where note_title = ?'
     const list = await this._sqlite.all(sql, [title]);
     const notes = await this.getNotesByGuid(list.map((item) => item.noteGuid))

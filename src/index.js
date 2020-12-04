@@ -74,8 +74,8 @@ async function setNoteMarkdown(userGuid, kbGuid, noteGuid, markdown) {
   return result;
 }
 
-async function getLinkToNotes(userGuid, kbGuid, title) {
-  const result = await users.getLinkToNotes(userGuid, kbGuid, title);
+async function getBackwardLinkedNotes(userGuid, kbGuid, title) {
+  const result = await users.getBackwardLinkedNotes(userGuid, kbGuid, title);
   return result;
 }
 
@@ -214,7 +214,7 @@ const wizApi = {
   downloadNoteResource,
   emitEvent,
   getAllTitles,
-  getLinkToNotes,
+  getBackwardLinkedNotes,
   core: {
     paths: require('./common/paths'),
     utils: require('./utils'),
