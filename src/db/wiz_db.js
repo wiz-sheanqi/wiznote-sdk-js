@@ -222,6 +222,10 @@ class WizDb extends EventEmitter {
     if (options.onTop) {
       conditions.push('onTop=1');
     }
+    if (options.title) {
+      conditions.push('title = ?');
+      values.push(options.title);
+    }
     //
     const sqlWhere = conditions.join(' and ');
     if (!options.searchText) {
@@ -282,11 +286,8 @@ class WizDb extends EventEmitter {
   }
 
   async getAllTitles() {
-    const sql = 'select guid,title,tags,modified from wiz_note order by modified desc';
+    const sql = 'select title from wiz_note order by modified desc';
     const notes = await this._sqlite.all(sql, []);
-    notes.forEach((note) => {
-      note.tags = (note.tags?.split('|') ?? []).map((tag) => trim(tag, '#/'))
-    })
     return notes;
   }
 
@@ -679,12 +680,10 @@ class WizDb extends EventEmitter {
     }
     //
     const { title, abstract } = noteData.extractNoteTitleAndAbstractFromText(note.text);
-    if (title !== note.title && await this.fixLinkedName(noteGuid, note.title, title)) {
-      const reg = new RegExp(`[[${note.title}]]`.replace(/[.[*?+^$|()/]|\]|\\/g, '\\$&'), 'g');
-      note.abstract = abstract.replace(reg, `[[${title}]]`);
-    } else {
-      note.abstract = abstract;
+    if (title !== note.title) {
+      await this.fixLinkedName(noteGuid, note.title, title)
     }
+    note.abstract = abstract;
     note.title = title;
    
     //
@@ -709,23 +708,26 @@ class WizDb extends EventEmitter {
     return note;
   }
 
+  async updateMarkdownLinksTask(guids, oldTitle, newTitle) {
+    const reg = new RegExp(`[[${oldTitle}]]`.replace(/[.[*?+^$|()/]|\]|\\/g, '\\$&'), 'g');
+    for (let i = 0; i < guids.length; i++) {
+      const markdown = await this.getNoteMarkdown(guids[i]);
+      await this.setNoteMarkdown(guids[i], markdown.replace(reg, `[[${newTitle}]]`), {
+        noModifyTime: true,
+        noUpdateTags: true,
+      });
+    }
+  }
+
   async fixLinkedName(guid, oldTitle, newTitle) {
     const selectNoteTitlesSql = 'select count(guid) as count from wiz_note where title = ? and guid != ?';
     const {count} = this._sqlite.firstRow(selectNoteTitlesSql, [oldTitle, guid]);
     if (count === 0) {
-      const sql = 'select guid, abstract from wiz_note where guid in (select note_guid from wiz_note_links where note_title = ?)'
-      const reg = new RegExp(`[[${oldTitle}]]`.replace(/[.[*?+^$|()/]|\]|\\/g, '\\$&'), 'g');
+      const sql = 'select note_guid from wiz_note_links where note_title = ?'
       const list = await this._sqlite.all(sql, [oldTitle]);
   
-      const updateNoteSql = 'update wiz_note set abstract=? where guid=?'
-      await Promise.all(list.filter(item => item.guid !== guid).map(item => this._sqlite.run(updateNoteSql, [tem.abstract.replace(reg, `[[${newTitle}]]`), item.guid])))
-  
-      const updateLinked = 'update wiz_note_links set note_title=? where note_title=?'
-      await this._sqlite.run(updateLinked, [newTitle, oldTitle]);
-
-      return true;
+      this.updateMarkdownLinksTask(list.map(item => item.noteGuid), oldTitle, newTitle);
     }
-    return false;
   }
 
   async getNoteMarkdown(noteGuid) {
@@ -879,12 +881,9 @@ class WizDb extends EventEmitter {
   }
 
   async getLinkToNotes(title) {
-    // const note = await this.getNote(noteGuid);
-    // const sql = 'select guid,title from wiz_note where note_links=? or note_links like ? or note_links like ? or note_links like ? or note_links=? or note_links like ? or note_links like ? or note_links like ?';
-    // const value = [noteGuid, `%|${noteGuid}`, `%|${noteGuid}|%`, `${noteGuid}|%`, note.title, `%|${note.title}`, `%|${note.title}|%`, `${note.title}|%`,];
-    // const notes = await this._sqlite.all(sql, value);
-    const sql = 'select wiz_note.title, wiz_note.guid from wiz_note_links join wiz_note on (wiz_note.guid = wiz_note_links.note_guid) where wiz_note_links.note_title = ?';
-    const notes = await this._sqlite.all(sql, [title]);
+    const sql = 'select note_guid from wiz_note_links where note_title = ?'
+    const list = await this._sqlite.all(sql, [title]);
+    const notes = await this.getNotesByGuid(list.map((item) => item.noteGuid))
     return notes;
   }
 
