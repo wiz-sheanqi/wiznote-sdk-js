@@ -222,6 +222,10 @@ class WizDb extends EventEmitter {
     if (options.onTop) {
       conditions.push('onTop=1');
     }
+    if (options.title) {
+      conditions.push('title = ?');
+      values.push(options.title);
+    }
     //
     const sqlWhere = conditions.join(' and ');
     if (!options.searchText) {
@@ -230,8 +234,12 @@ class WizDb extends EventEmitter {
       if (!options.withText) {
         notes.forEach((note) => {
           delete note.text;
+          if (options.analysisTags) {
+            note.tags = (note.tags?.split('|') ?? []).map((tag) => trim(tag, '#/'))
+          }
         });
       }
+      
       return notes;
     }
     //
@@ -279,6 +287,12 @@ class WizDb extends EventEmitter {
     }
     //
     return result;
+  }
+
+  async getAllTitles() {
+    const sql = 'select title from wiz_note order by modified desc';
+    const notes = await this._sqlite.all(sql);
+    return notes.map((item) => item.title);
   }
 
   async getNotesByGuid(noteGuidArr) {
@@ -670,8 +684,12 @@ class WizDb extends EventEmitter {
     }
     //
     const { title, abstract } = noteData.extractNoteTitleAndAbstractFromText(note.text);
-    note.title = title;
+    if (title !== note.title) {
+      await this.fixLinkedNotesMarkdown(noteGuid, note.title, title)
+    }
     note.abstract = abstract;
+    note.title = title;
+   
     //
     const sql = `update wiz_note set title=?, version=?, local_status=?, data_md5=?, modified=?, abstract=?, text=? where guid=?`;
     const values = [note.title, note.version, note.localStatus, note.dataMd5,
@@ -685,10 +703,35 @@ class WizDb extends EventEmitter {
       // do nothing
     } else {
       await this.updateNoteTags(noteGuid, markdown);
+    }
+
+    if (!options.noUpdateLinks) {
       await this.updateNoteLinks(noteGuid, markdown);
     }
     //
     return note;
+  }
+
+  async updateMarkdownLinksTask(guids, oldTitle, newTitle) {
+    const reg = new RegExp(`[[${oldTitle}]]`.replace(/[.[*?+^$|()/]|\]|\\/g, '\\$&'), 'g');
+    for (let i = 0; i < guids.length; i++) {
+      const markdown = await this.getNoteMarkdown(guids[i]);
+      await this.setNoteMarkdown(guids[i], markdown.replace(reg, `[[${newTitle}]]`), {
+        noModifyTime: true,
+        noUpdateTags: true,
+      });
+    }
+  }
+
+  async fixLinkedNotesMarkdown(guid, oldTitle, newTitle) {
+    const selectNoteTitlesSql = 'select count(guid) as count from wiz_note where title = ? and guid != ?';
+    const {count} = await this._sqlite.firstRow(selectNoteTitlesSql, [oldTitle, guid]);
+    if (count === 0) {
+      const sql = 'select note_guid as noteGuid from wiz_note_links where note_title = ?'
+      const list = await this._sqlite.all(sql, [oldTitle]);
+  
+      this.updateMarkdownLinksTask(list.map(item => item.noteGuid), oldTitle, newTitle);
+    }
   }
 
   async getNoteMarkdown(noteGuid) {
@@ -839,6 +882,13 @@ class WizDb extends EventEmitter {
     note.starred = starred;
     this.emit('modifyNote', note);
     //
+  }
+
+  async getBackwardLinkedNotes(title) {
+    const sql = 'select note_guid as noteGuid from wiz_note_links where note_title = ?'
+    const list = await this._sqlite.all(sql, [title]);
+    const notes = await this.getNotesByGuid(list.map((item) => item.noteGuid))
+    return notes;
   }
 
   async hasNotesInTrash() {

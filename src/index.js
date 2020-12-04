@@ -55,6 +55,10 @@ async function queryNotes(userGuid, kbGuid, start, count, options = {}) {
   return notes;
 }
 
+async function getAllTitles (userGuid, kbGuid) {
+  return await users.getAllTitles(userGuid, kbGuid);
+}
+
 async function getNote(userGuid, kbGuid, noteGuid, options) {
   const result = await users.getNote(userGuid, kbGuid, noteGuid, options);
   return result;
@@ -67,6 +71,11 @@ async function getNoteMarkdown(userGuid, kbGuid, noteGuid) {
 
 async function setNoteMarkdown(userGuid, kbGuid, noteGuid, markdown) {
   const result = await users.setNoteMarkdown(userGuid, kbGuid, noteGuid, markdown);
+  return result;
+}
+
+async function getBackwardLinkedNotes(userGuid, kbGuid, title) {
+  const result = await users.getBackwardLinkedNotes(userGuid, kbGuid, title);
   return result;
 }
 
@@ -204,6 +213,8 @@ const wizApi = {
   refreshUserInfo,
   downloadNoteResource,
   emitEvent,
+  getAllTitles,
+  getBackwardLinkedNotes,
   core: {
     paths: require('./common/paths'),
     utils: require('./utils'),

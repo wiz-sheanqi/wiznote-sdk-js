@@ -262,6 +262,13 @@ class Users {
     return notes;
   }
 
+  async getAllTitles (userGuid, kbGuid) {
+    const userData = this.getUserData(userGuid);
+    const db = await userData.getDb(kbGuid);
+    const res = await db.getAllTitles();
+    return res;
+  }
+
   async getNote(userGuid, kbGuid, noteGuid, options) {
     const userData = this.getUserData(userGuid);
     const db = await userData.getDb(kbGuid);
@@ -280,6 +287,12 @@ class Users {
     const userData = this.getUserData(userGuid);
     const db = await userData.getDb(kbGuid);
     await db.setNoteMarkdown(noteGuid, markdown);
+  }
+
+  async getBackwardLinkedNotes(userGuid, kbGuid, title) {
+    const userData = this.getUserData(userGuid);
+    const db = await userData.getDb(kbGuid);
+    return await db.getBackwardLinkedNotes(title);
   }
 
   async downloadNoteResource(userGuid, kbGuid, noteGuid, resName) {
