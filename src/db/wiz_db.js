@@ -685,7 +685,7 @@ class WizDb extends EventEmitter {
     //
     const { title, abstract } = noteData.extractNoteTitleAndAbstractFromText(note.text);
     if (title !== note.title) {
-      await this.fixLinkedName(noteGuid, note.title, title)
+      await this.fixLinkedNotesMarkdown(noteGuid, note.title, title)
     }
     note.abstract = abstract;
     note.title = title;
@@ -723,7 +723,7 @@ class WizDb extends EventEmitter {
     }
   }
 
-  async fixLinkedName(guid, oldTitle, newTitle) {
+  async fixLinkedNotesMarkdown(guid, oldTitle, newTitle) {
     const selectNoteTitlesSql = 'select count(guid) as count from wiz_note where title = ? and guid != ?';
     const {count} = await this._sqlite.firstRow(selectNoteTitlesSql, [oldTitle, guid]);
     if (count === 0) {
