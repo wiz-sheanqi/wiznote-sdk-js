@@ -234,8 +234,12 @@ class WizDb extends EventEmitter {
       if (!options.withText) {
         notes.forEach((note) => {
           delete note.text;
+          if (options.analysisTags) {
+            note.tags = (note.tags?.split('|') ?? []).map((tag) => trim(tag, '#/'))
+          }
         });
       }
+      
       return notes;
     }
     //
@@ -721,9 +725,9 @@ class WizDb extends EventEmitter {
 
   async fixLinkedName(guid, oldTitle, newTitle) {
     const selectNoteTitlesSql = 'select count(guid) as count from wiz_note where title = ? and guid != ?';
-    const {count} = this._sqlite.firstRow(selectNoteTitlesSql, [oldTitle, guid]);
+    const {count} = await this._sqlite.firstRow(selectNoteTitlesSql, [oldTitle, guid]);
     if (count === 0) {
-      const sql = 'select note_guid from wiz_note_links where note_title = ?'
+      const sql = 'select note_guid as noteGuid from wiz_note_links where note_title = ?'
       const list = await this._sqlite.all(sql, [oldTitle]);
   
       this.updateMarkdownLinksTask(list.map(item => item.noteGuid), oldTitle, newTitle);
@@ -881,7 +885,7 @@ class WizDb extends EventEmitter {
   }
 
   async getLinkToNotes(title) {
-    const sql = 'select note_guid from wiz_note_links where note_title = ?'
+    const sql = 'select note_guid as noteGuid from wiz_note_links where note_title = ?'
     const list = await this._sqlite.all(sql, [title]);
     const notes = await this.getNotesByGuid(list.map((item) => item.noteGuid))
     return notes;
