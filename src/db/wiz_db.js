@@ -493,6 +493,7 @@ class WizDb extends EventEmitter {
     await noteData.writeNoteHtml(this._userGuid, kbGuid, noteGuid, html);
     await this.setNoteLocalStatus(noteGuid, LOCAL_STATUS_DOWNLOADED);
     const markdown = noteData.getMarkdownFromHtml(html);
+    await this.updateNoteLinks(noteGuid, markdown);
     const text = removeMd(markdown);
     await this.setNoteText(noteGuid, text);
   }
